@@ -27,9 +27,15 @@ spec:
               cpu: "500m"
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://db:5432/mydb
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: db_url
             - name: SPRING_DATASOURCE_USERNAME
-              value: user
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: username
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
