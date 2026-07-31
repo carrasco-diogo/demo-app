@@ -1,0 +1,39 @@
+name: CI/CD Pipeline
+on: push
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Run tests
+        run: mvn test
+
+      - name: Build Docker image
+        run: docker build -t demo-app .
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
+
+      - name: Login to ECR
+        run: aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 882557516794.dkr.ecr.eu-north-1.amazonaws.com
+
+      - name: Docker Tag
+        run: docker tag demo-app:latest 882557516794.dkr.ecr.eu-north-1.amazonaws.com/demo-app:${{ github.sha }}
+
+      - name: Push to ECR
+        run: docker push 882557516794.dkr.ecr.eu-north-1.amazonaws.com/demo-app:${{ github.sha }}
+
+
