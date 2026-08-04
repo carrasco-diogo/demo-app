@@ -64,9 +64,9 @@ jobs:
       - name: Authenticate in EKS
         run: aws eks update-kubeconfig --region eu-north-1 --name ${{ secrets.EKS_CLUSTER_NAME }}
 
-      - name: Update tag
-        run:  kubectl set image deployment/demo-app demo-app=${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY  }}:${{ github.sha }}
-
       - name: kubectl apply
         run:  kubectl apply -f k8s/
+
+      - name: Update tag
+        run:  kubectl set image deployment/demo-app demo-app=${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY  }}:${{ github.sha }}
 
